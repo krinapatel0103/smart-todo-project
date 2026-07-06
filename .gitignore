@@ -1,0 +1,20 @@
+# Environment variables
+.env
+backend/.env
+
+# Node
+node_modules/
+frontend/build/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+backend/venv/
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
