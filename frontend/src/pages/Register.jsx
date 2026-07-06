@@ -4,7 +4,7 @@
 import React, {useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-import { hashPassword } from '../utils/hashPassword';
+// import { hashPassword } from '../utils/hashPassword';
 import '../styles/Auth.css';
 
 function Register() {
@@ -44,15 +44,17 @@ function Register() {
         try {
          console.log("2. Password match ho gaya, hashing shuru"); // ← YEH ADD KARO
         
-        const hashedPassword = await hashPassword(formData.password);
-        const hashedConfirmPassword = await hashPassword(formData.confirm_password);
+        // const hashedPassword = await hashPassword(formData.password);
+        // const hashedConfirmPassword = await hashPassword(formData.confirm_password);
 
         console.log("3. Hashing complete, sending request"); // ← YEH ADD KARO
         await axiosInstance.post('/auth/register', {
             username         : formData.username,
             email            : formData.email,
-            password         : hashedPassword,
-            confirm_password : hashedConfirmPassword,
+            password         : formData.password,
+            confirm_password : formData.confirm_password,
+            // password         : hashedPassword,
+            // confirm_password : hashedConfirmPassword,
         });
         
         console.log("4. API call SUCCESS"); // ← YEH ADD KARO
@@ -69,7 +71,7 @@ function Register() {
         console.log("5. API call FAILED, error:", err); // ← YEH ADD KARO
         console.log("Error response:", err.response); // ← YEH ADD KARO
         console.log("Error message:", err.message); // ← YEH ADD KARO
-        
+
         const detail = err.response?.data?.detail;
         if (Array.isArray(detail)) {
             setError(detail.map(d => d.msg).join(', '));
