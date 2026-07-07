@@ -29,7 +29,6 @@ function Register() {
     // ----Handle Submit ----
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("1. Submit trigger hua");
         setError('');
         setSuccess('');
         setLoading(true);
@@ -42,12 +41,9 @@ function Register() {
         }
 
         try {
-         console.log("2. Password match ho gaya, hashing shuru"); // ← YEH ADD KARO
-        
         // const hashedPassword = await hashPassword(formData.password);
         // const hashedConfirmPassword = await hashPassword(formData.confirm_password);
 
-        console.log("3. Hashing complete, sending request"); // ← YEH ADD KARO
         await axiosInstance.post('/auth/register', {
             username         : formData.username,
             email            : formData.email,
@@ -56,8 +52,6 @@ function Register() {
             // password         : hashedPassword,
             // confirm_password : hashedConfirmPassword,
         });
-        
-        console.log("4. API call SUCCESS"); // ← YEH ADD KARO
 
         setSuccess('Account created! redirecting to login...');
 
@@ -67,10 +61,6 @@ function Register() {
         }, 2000);
 
       } catch (err) {
-
-        console.log("5. API call FAILED, error:", err); // ← YEH ADD KARO
-        console.log("Error response:", err.response); // ← YEH ADD KARO
-        console.log("Error message:", err.message); // ← YEH ADD KARO
 
         const detail = err.response?.data?.detail;
         if (Array.isArray(detail)) {
