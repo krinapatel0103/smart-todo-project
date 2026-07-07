@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: smart_todo_db_dev
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: dockerpass123
+      MYSQL_DATABASE: smart_todo_fastapi_dev
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pdockerpass123"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: smart_todo_backend_dev
+    restart: always
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: mysql+pymysql://root:dockerpass123@db:3306/smart_todo_fastapi_dev
+    ports:
+      - "8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: smart_todo_frontend_dev
+    restart: always
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data_dev:
