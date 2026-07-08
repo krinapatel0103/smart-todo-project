@@ -48,6 +48,37 @@ function Settings() {
     document.body.classList.toggle('dark', newVal);
   };
 
+  // ─── Export Functions ────────────────────────────────────────────────────────
+  const handleExportPDF = async () => {
+    try {
+      const res = await axiosInstance.get('/todos/export/pdf', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'smart_todo_export.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error('PDF export failed', err);
+    }
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      const res = await axiosInstance.get('/todos/export/excel', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'smart_todo_export.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error('Excel export failed', err);
+    }
+  };
+
   return (
     <div className="settings-container">
 
@@ -125,6 +156,28 @@ function Settings() {
               <h4>Username</h4>
               <p>{username}</p>
             </div>
+          </div>
+        </div>
+
+        {/* Export Data */}
+        <div className="settings-card">
+          <h3>Export Data</h3>
+          <p>Download all your tasks in PDF or Excel format</p>
+
+          <div className="settings-row" style={{borderTop: 'none', paddingTop: 0}}>
+            <div className="settings-row-left">
+              <h4>Export as PDF</h4>
+              <p>Download a printable PDF of all your tasks</p>
+            </div>
+            <button className="export-btn" onClick={handleExportPDF}>📄 Download</button>
+          </div>
+
+          <div className="settings-row">
+            <div className="settings-row-left">
+              <h4>Export as Excel</h4>
+              <p>Download a spreadsheet of all your tasks</p>
+            </div>
+            <button className="export-btn" onClick={handleExportExcel}>📊 Download</button>
           </div>
         </div>
 

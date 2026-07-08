@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from database import get_db
 from auth import get_current_user
@@ -6,6 +7,16 @@ import models
 import schemas
 from typing import List
 import json
+import io
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
 
 router = APIRouter(
     prefix="/todos",
@@ -52,6 +63,102 @@ def get_todos(db: Session = Depends(get_db),
         todo.subtasks = json.loads(todo.subtasks or "[]")
 
     return todos
+
+# Export Todos as PDF :---
+
+@router.get("/export/pdf")
+def export_todos_pdf(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    todos = db.query(models.Todo).filter(models.Todo.user_id == current_user.id).all()
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=1.5*cm)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    elements.append(Paragraph("Smart Todo — Task Export", styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    priority_map = {1: "Low", 2: "Medium", 3: "High"}
+    data = [["Title", "Priority", "Tags", "Deadline", "Status"]]
+
+    for t in todos:
+        deadline_str = f"{t.deadline_date or ''} {str(t.deadline_time or '')[:5]}"
+        data.append([
+            t.title,
+            priority_map.get(t.priority, str(t.priority)),
+            t.tags or "-",
+            deadline_str.strip() or "-",
+            "Completed" if t.completed else "Pending",
+        ])
+
+    table = Table(data, repeatRows=1, colWidths=[5.5*cm, 2.5*cm, 3*cm, 3.5*cm, 2.5*cm])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e5e7eb')),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f4f6f9')]),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    elements.append(table)
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=smart_todo_export.pdf"}
+    )
+
+
+# Export Todos as Excel :---
+
+@router.get("/export/excel")
+def export_todos_excel(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    todos = db.query(models.Todo).filter(models.Todo.user_id == current_user.id).all()
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Todos"
+
+    priority_map = {1: "Low", 2: "Medium", 3: "High"}
+    headers = ["Title", "Priority", "Tags", "Deadline Date", "Deadline Time", "Status"]
+    ws.append(headers)
+
+    header_fill = PatternFill(start_color="2563EB", end_color="2563EB", fill_type="solid")
+    for col_num, _ in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_num)
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal="center")
+
+    for t in todos:
+        ws.append([
+            t.title,
+            priority_map.get(t.priority, str(t.priority)),
+            t.tags or "-",
+            str(t.deadline_date or "-"),
+            str(t.deadline_time or "-")[:5],
+            "Completed" if t.completed else "Pending",
+        ])
+
+    for col in ws.columns:
+        max_length = max(len(str(cell.value or "")) for cell in col)
+        ws.column_dimensions[col[0].column_letter].width = max_length + 4
+
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=smart_todo_export.xlsx"}
+    )
 
 
 # Get Single Todo :---
