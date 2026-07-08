@@ -4,9 +4,15 @@
 
 import axios from 'axios';
 
-// baseURL -> FastAPI server address - har request mein automatically lagega
+// Frontend jis port pe chal raha hai, uske hisaab se sahi backend port choose karo
+// Dev frontend (3001) -> Dev backend (8001)
+// Prod frontend (3000) -> Prod backend (8000)
+const currentPort = window.location.port;
+const apiPort = currentPort === '3001' ? '8001' : '8000';
+const baseURL = `http://${window.location.hostname}:${apiPort}`;
+
 const axiosInstance = axios.create({
-    baseURL: 'http://127.0.0.1:8000',
+    baseURL: baseURL,
 });
 
 // Request Interceptor -> Har API call se pehle yeh chalega 

@@ -7,6 +7,8 @@ import axiosInstance from '../api/axiosInstance';
 // import { hashPassword } from '../utils/hashPassword';
 import '../styles/Auth.css';
 
+import { Eye, EyeOff } from 'react-feather';
+
 function Login() {
     // ------- State -------
     const [formData, setFormData] = useState({
@@ -16,7 +18,9 @@ function Login() {
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-
+    
+    const [showPassword, setShowPassword] = useState(false);
+    
     const navigate = useNavigate();
 
     // -------- Handle Input change ------
@@ -81,14 +85,24 @@ function Login() {
 
           <div className="form-group">
             <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className="auth-btn" disabled={loading}>

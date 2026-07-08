@@ -1,0 +1,50 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  deploy-dev:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Dev environment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd ${{ secrets.VM_PROJECT_PATH }}
+            git checkout develop
+            git pull origin develop
+            docker compose -f docker-compose.dev.yml up -d --build
+
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Production environment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd ${{ secrets.VM_PROJECT_PATH }}
+            git checkout main
+            git pull origin main
+            docker compose -f docker-compose.dev.yml build --no-cache
+            docker compose -f docker-compose.dev.yml up -d  

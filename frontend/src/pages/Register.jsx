@@ -7,6 +7,8 @@ import axiosInstance from '../api/axiosInstance';
 // import { hashPassword } from '../utils/hashPassword';
 import '../styles/Auth.css';
 
+import { Eye, EyeOff } from 'react-feather';
+
 function Register() {
     const [formData, setFormData] = useState({
         username : "",
@@ -19,6 +21,9 @@ function Register() {
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const navigate = useNavigate();
 
     // ------ Handle Input change --------
@@ -29,7 +34,6 @@ function Register() {
     // ----Handle Submit ----
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("1. Submit trigger hua");
         setError('');
         setSuccess('');
         setLoading(true);
@@ -42,12 +46,9 @@ function Register() {
         }
 
         try {
-         console.log("2. Password match ho gaya, hashing shuru"); // ← YEH ADD KARO
-        
         // const hashedPassword = await hashPassword(formData.password);
         // const hashedConfirmPassword = await hashPassword(formData.confirm_password);
 
-        console.log("3. Hashing complete, sending request"); // ← YEH ADD KARO
         await axiosInstance.post('/auth/register', {
             username         : formData.username,
             email            : formData.email,
@@ -56,8 +57,6 @@ function Register() {
             // password         : hashedPassword,
             // confirm_password : hashedConfirmPassword,
         });
-        
-        console.log("4. API call SUCCESS"); // ← YEH ADD KARO
 
         setSuccess('Account created! redirecting to login...');
 
@@ -67,10 +66,6 @@ function Register() {
         }, 2000);
 
       } catch (err) {
-
-        console.log("5. API call FAILED, error:", err); // ← YEH ADD KARO
-        console.log("Error response:", err.response); // ← YEH ADD KARO
-        console.log("Error message:", err.message); // ← YEH ADD KARO
 
         const detail = err.response?.data?.detail;
         if (Array.isArray(detail)) {
@@ -123,30 +118,48 @@ function Register() {
                     />
                 </div>
 
-                <div className = "form-group">
+                <div className="form-group">
                     <label>Password</label>
-
-                    <input
-                        type = "password"
-                        name = "password"
-                        value = {formData.password}
-                        onChange = {handleChange}
-                        placeholder = "Enter password"
-                        required
-                    />
+                    <div className="password-wrapper">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Enter password"
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="toggle-password"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
                 </div>
 
-                <div className = "form-group">
+                <div className="form-group">
                     <label>Confirm Password</label>
-
-                    <input
-                        type = "password"
-                        name = "confirm_password"
-                        value = {formData.confirm_password}
-                        onChange = {handleChange}
-                        placeholder = "Confirm Your password"
-                        required
-                    />
+                    <div className="password-wrapper">
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            name="confirm_password"
+                            value={formData.confirm_password}
+                            onChange={handleChange}
+                            placeholder="Confirm Your password"
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="toggle-password"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        >
+                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
                 </div>
 
                 <button type = "submit" className = "auth-btn" disabled = {loading}>

@@ -16,15 +16,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-      
+
   backend:
     build: ./backend
     container_name: smart_todo_backend
     restart: always
     env_file:
       - ./backend/.env
-    environment:
-      DATABASE_URL: mysql+pymysql://root:dockerpass123@db:3306/smart_todo_fastapi
     ports:
       - "8000:8000"
     depends_on:
@@ -39,6 +37,6 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-  
+
 volumes:
   mysql_data:

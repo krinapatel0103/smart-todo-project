@@ -15,6 +15,7 @@ function Dashboard() {
   const [searchText,      setSearchText]      = useState('');
   const [submitting,      setSubmitting]      = useState(false);
   const [darkMode,        setDarkMode]        = useState(false);
+  const [now,             setNow]             = useState(new Date());
   const [showNotif,       setShowNotif]       = useState(false);
   const [notifEnabled,    setNotifEnabled]    = useState(true);
   const [formData,        setFormData]        = useState({
@@ -50,6 +51,12 @@ function Dashboard() {
     document.body.classList.toggle('dark', newVal);
   };
 
+  // ─── Live Countdown Ticker ───────────────────────────────────────────────────
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   // ─── Close dropdown when clicking outside ───────────────────────────────────
   useEffect(() => {
     const handleClick = (e) => {
@@ -74,6 +81,28 @@ function Dashboard() {
     if (diffMs < 0)       return 'overdue';
     if (diffHrs <= 24)    return 'due-soon';
     return null;
+  };
+
+  // ─── Countdown Text ──────────────────────────────────────────────────────────
+  const getCountdownText = (todo) => {
+    if (!todo.deadline_date) return '';
+    const deadline = new Date(`${todo.deadline_date}T${todo.deadline_time || '23:59:00'}`);
+    const diffMs   = deadline - now;
+
+    if (diffMs < 0) {
+      const absMs = Math.abs(diffMs);
+      const h = Math.floor(absMs / (1000 * 60 * 60));
+      const m = Math.floor((absMs % (1000 * 60 * 60)) / (1000 * 60));
+      return `Overdue by ${h}h ${m}m`;
+    }
+
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hrs  = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+    if (days > 0) return `${days}d ${hrs}h left`;
+    return `${hrs}h ${mins}m ${secs}s left`;
   };
 
   // ─── Fetch + Auto Show ───────────────────────────────────────────────────────
@@ -324,6 +353,9 @@ function Dashboard() {
                             <div className="notif-title">{todo.title}</div>
                             <div className="notif-time">
                               📅 {todo.deadline_date} ⏰ {todo.deadline_time?.slice(0,5)}
+                              <div className={`notif-countdown ${getDeadlineStatus(todo)}`}>
+                                {getCountdownText(todo)}
+                              </div>
                             </div>
                           </div>
                           <span className={`notif-tag ${status}`}>
@@ -457,6 +489,11 @@ function Dashboard() {
                       <div className="todo-deadline">
                         <span>📅 {todo.deadline_date}</span>
                         {todo.deadline_time && <span>⏰ {todo.deadline_time.slice(0,5)}</span>}
+                        {!todo.completed && (
+                          <span className={`countdown-badge ${alertStatus || ''}`}>
+                            {getCountdownText(todo)}
+                          </span>
+                        )}
                       </div>
                     )}
 
@@ -518,7 +555,7 @@ function Dashboard() {
 
               <div className="form-group">
                 <label>Priority *</label>
-                <select name="priority" value={formData.priority} onChange={handleFormChange}>
+                <select name="priority" value={formData.priority} onChange={handleFormChange} required>
                   <option value="1">Low Priority</option>
                   <option value="2">Medium Priority</option>
                   <option value="3">High Priority</option>
@@ -526,9 +563,9 @@ function Dashboard() {
               </div>
 
               <div className="form-group">
-                <label>Tags</label>
-                <select name="tags" value={formData.tags} onChange={handleFormChange}>
-                  <option value="">Select a tag...</option>
+                <label>Tags *</label>
+                <select name="tags" value={formData.tags} onChange={handleFormChange} required>
+                  <option value="" disabled>Select a tag...</option>
                   {availableTags.map(tag => (
                     <option key={tag} value={tag}>{tag}</option>
                   ))}

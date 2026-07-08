@@ -1,137 +1,376 @@
 /* Auth.css
-   Purpose: Styling for Login and Register pages */
-
+   Purpose: Styling for Login and Register pages
+   Design: Notepad-inspired card with a perforated top edge — nods to the
+   "Smart Todo" notepad concept. Ink-navy backdrop, warm amber accent
+   instead of the generic purple-blue gradient. */
+ 
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+ 
+:root {
+  --ink: #12172b;
+  --midnight: #1b2a4a;
+  --deep-blue: #0f3460;
+  --amber: #e7a33e;
+  --amber-deep: #c97f1e;
+  --heading: #1a1a2e;
+  --muted: #7a7f8c;
+  --border: #e4e4e7;
+  --card-bg: #fffdf9;
+  --success: #2f9e6e;
+  --success-bg: #eafbf3;
+  --success-border: #a8e6cf;
+  --error: #d94f45;
+  --error-bg: #fdeeee;
+  --error-border: #f4c6c2;
+}
+ 
 /* ---- Page Background ---- */
 .auth-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  padding: 24px;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--midnight) 50%, var(--deep-blue) 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
-
+ 
 /* ------ Card --------- */
 .auth-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 40px;
+  position: relative;
+  background: var(--card-bg);
+  border-radius: 4px 4px 16px 16px;
+  padding: 44px 40px 40px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 24px 60px rgba(15, 25, 55, 0.35);
+  overflow: hidden;
 }
-
+ 
+/* Perforated notepad edge — the signature detail */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--amber) 0 10px,
+    transparent 10px 20px
+  );
+  opacity: 0.75;
+}
+ 
+.auth-card::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--border) 0 6px,
+    transparent 6px 12px
+  );
+}
+ 
 /* ------- Header ------- */
 .auth-header {
   text-align: center;
   margin-bottom: 32px;
 }
-
+ 
 .auth-header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a2e;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--heading);
   margin-bottom: 6px;
+  letter-spacing: -0.01em;
 }
-
+ 
 .auth-header p {
   font-size: 14px;
-  color: #888888;
+  color: var(--muted);
 }
-
+ 
 /* ------- Form ---------- */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
-
+ 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-
+ 
 .form-group label {
   font-size: 13px;
   font-weight: 600;
   color: #444444;
 }
-
+ 
 .form-group input {
   padding: 12px 16px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
+  font-family: inherit;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   color: #333333;
+  background: #ffffff;
 }
-
-.form-group input:focus {
-  border-color: #0f3460;
+ 
+.form-group input:focus,
+.form-group input:focus-visible {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(231, 163, 62, 0.18);
 }
-
+ 
+.form-group input::placeholder {
+  color: #b7bac2;
+}
+ 
 /* ------- Button --------- */
 .auth-btn {
   padding: 13px;
-  background: linear-gradient(135deg, #0f3460, #533483);
-  color: #ffffff;
+  background: var(--amber);
+  color: var(--ink);
   border: none;
   border-radius: 8px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.15s ease, transform 0.1s ease;
   margin-top: 4px;
 }
-
-.auth-btn:hover {
-  opacity: 0.9;
+ 
+.auth-btn:hover:not(:disabled) {
+  background: var(--amber-deep);
 }
-
+ 
+.auth-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+ 
+.auth-btn:focus-visible {
+  outline: 2px solid var(--deep-blue);
+  outline-offset: 2px;
+}
+ 
 .auth-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
-
+ 
 /* ------ Error ------- */
 .auth-error {
-  background: #fff0f0;
-  color: #e74c3c;
-  border: 1px solid #fcc;
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid var(--error-border);
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 13px;
   margin-bottom: 8px;
   text-align: center;
 }
-
+ 
+/* ------ Success ------- */
+.auth-success {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+ 
 /* ------- Bottom Link -------- */
 .auth-link {
   text-align: center;
   margin-top: 20px;
   font-size: 13px;
-  color: #888888;
+  color: var(--muted);
 }
-
+ 
 .auth-link a {
-  color: #0f3460;
+  color: var(--deep-blue);
   font-weight: 600;
   text-decoration: none;
 }
-
+ 
 .auth-link a:hover {
   text-decoration: underline;
 }
-
-/* ------ Success ------- */
-.auth-success {
-    background: #f0fff4;
-    color: #27ae60;
-    border: 1px solid #a8e6cf;
-    border-radius: 8px;
-    padding: 10px 14px;
+ 
+/* ------- Responsive — mobile ---------- */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 16px;
+  }
+ 
+  .auth-card {
+    padding: 36px 24px 28px;
+    border-radius: 4px 4px 12px 12px;
+  }
+ 
+  .auth-header h1 {
+    font-size: 25px;
+  }
+ 
+  .auth-header p {
     font-size: 13px;
-    margin-bottom: 8px;
-    text-align: center;
+  }
+ 
+  .form-group input {
+    padding: 11px 14px;
+    font-size: 16px; /* prevents iOS auto-zoom on focus */
+  }
+ 
+  .auth-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+ 
+/* ------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .form-group input,
+  .auth-btn {
+    transition: none;
+  }
+}
+ 
+/* ------- Animated Background Shapes ---------- */
+.auth-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before,
+.auth-container::after {
+  content: '';
+  position: absolute;
+  border: 2px solid rgba(231, 163, 62, 0.15);
+  border-radius: 6px;
+  animation: float 8s ease-in-out infinite;
+}
+
+.auth-container::before {
+  width: 60px;
+  height: 60px;
+  top: 15%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.auth-container::after {
+  width: 40px;
+  height: 40px;
+  bottom: 20%;
+  right: 12%;
+  animation-delay: 3s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(8deg); }
+}
+
+/* ------- Password Toggle ---------- */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  transition: color 0.15s ease;
+}
+
+.toggle-password:hover {
+  color: var(--amber-deep);
+}
+
+/* ------- Card Entrance Animation ---------- */
+.auth-card {
+  animation: cardEnter 0.4s ease-out;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------- Button Loading Spinner ---------- */
+.auth-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-btn:disabled::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(18, 23, 43, 0.3);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ------- Input Shake On Error ---------- */
+.auth-error {
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-container::before,
+  .auth-container::after,
+  .auth-card,
+  .auth-error,
+  .auth-btn:disabled::before {
+    animation: none;
+  }
 }

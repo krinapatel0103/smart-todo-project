@@ -180,3 +180,100 @@
   color: #16a34a;
   font-weight: 500;
 }
+
+.export-btn {
+  background: transparent;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.export-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+@media (max-width: 480px) {
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .export-btn {
+    width: 100%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — Tablet & Mobile
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  .settings-navbar {
+    padding: 0 16px;
+  }
+
+  .settings-navbar-left {
+    gap: 10px;
+  }
+
+  .settings-brand {
+    font-size: 15px;
+  }
+
+  .settings-brand-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .navbar-welcome {
+    display: none; /* chhote screen pe space bachane ke liye */
+  }
+
+  .settings-content {
+    padding: 20px 16px;
+  }
+
+  .settings-title-section h1 {
+    font-size: 22px;
+  }
+
+  .settings-card {
+    padding: 18px;
+  }
+
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .toggle-switch {
+    align-self: flex-start;
+  }
+
+  .save-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .save-success {
+    display: block;
+    margin-left: 0;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .settings-title-section h1 {
+    font-size: 20px;
+  }
+}
