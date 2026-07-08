@@ -46,4 +46,5 @@ jobs:
             cd ${{ secrets.VM_PROJECT_PATH }}
             git checkout main
             git pull origin main
-            docker compose -f docker-compose.prod.yml up -d --build  
+            docker compose -f docker-compose.dev.yml build --no-cache
+            docker compose -f docker-compose.dev.yml up -d  
