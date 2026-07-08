@@ -3,6 +3,7 @@ services:
     image: mysql:8.0
     container_name: smart_todo_db
     restart: always
+    command: --default-time-zone='+05:30'
     environment:
       MYSQL_ROOT_PASSWORD: dockerpass123
       MYSQL_DATABASE: smart_todo_fastapi
