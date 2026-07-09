@@ -1,3 +1,4 @@
+name: smart_todo_prod
 services:
   db:
     image: mysql:8.0
