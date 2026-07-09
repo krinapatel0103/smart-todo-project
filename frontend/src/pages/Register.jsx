@@ -4,7 +4,7 @@
 import React, {useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-// import { hashPassword } from '../utils/hashPassword';
+import { hashPassword } from '../utils/hashPassword';
 import '../styles/Auth.css';
 
 import { Eye, EyeOff } from 'react-feather';
@@ -46,16 +46,14 @@ function Register() {
         }
 
         try {
-        // const hashedPassword = await hashPassword(formData.password);
-        // const hashedConfirmPassword = await hashPassword(formData.confirm_password);
+        const hashedPassword = await hashPassword(formData.password);
+        const hashedConfirmPassword = await hashPassword(formData.confirm_password);
 
         await axiosInstance.post('/auth/register', {
             username         : formData.username,
             email            : formData.email,
-            password         : formData.password,
-            confirm_password : formData.confirm_password,
-            // password         : hashedPassword,
-            // confirm_password : hashedConfirmPassword,
+            password         : hashedPassword,
+            confirm_password : hashedConfirmPassword,
         });
 
         setSuccess('Account created! redirecting to login...');
