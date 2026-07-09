@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-// import { hashPassword } from '../utils/hashPassword';
+import { hashPassword } from '../utils/hashPassword';
 import '../styles/Auth.css';
 
 import { Eye, EyeOff } from 'react-feather';
@@ -36,12 +36,12 @@ function Login() {
 
     try {
       // Hash the password before sending to backend
-      // const hashedPassword = await hashPassword(formData.password);
+      const hashedPassword = await hashPassword(formData.password);
       
       // OAuth2 form-data format — FastAPI expects this for login
       const form = new FormData();
       form.append('username', formData.username);
-      form.append('password', formData.password);
+      form.append('password', hashedPassword);
 
       const response = await axiosInstance.post('/auth/login', form);
 
